@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyoba OCR</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <style>
+      #select-box {
+        position: absolute;
+        border: 2px solid blue;
+        background-color: rgba(0, 0, 255, 0.2);
+        cursor: move;
+      }
+
+      #select-box .resize-handle {
+        width: 10px;
+        height: 10px;
+        background: blue;
+        position: absolute;
+        cursor: nwse-resize;
+      }
+
+      #select-box .resize-handle.top-left {
+        top: -5px;
+        left: -5px;
+      }
+
+      #select-box .resize-handle.top-right {
+        top: -5px;
+        right: -5px;
+      }
+
+      #select-box .resize-handle.bottom-left {
+        bottom: -5px;
+        left: -5px;
+      }
+
+      #select-box .resize-handle.bottom-right {
+        bottom: -5px;
+        right: -5px;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-900 text-gray-200">
+    <div id="app" class="min-h-screen flex flex-col items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-6xl flex flex-col items-center">
+        <h1 class="text-2xl mb-4 text-center font-semibold">File Sertifikat</h1>
+        <div class="flex flex-wrap w-full">
+          <div class="w-full mb-4">
+            <input type="file" @change="handleFileUpload" accept="application/pdf"
+              class="p-2 bg-gray-700 rounded text-gray-200 w-full">
+          </div>
+          <div class="w-full lg:w-1/2 p-2 relative">
+            <div class="bg-gray-700 p-4 rounded">
+              <canvas id="pdf-canvas" class="w-full"></canvas>
+              <div id="select-box" v-if="showBox" :style="boxStyle" @mousedown="initDrag">
+                <div class="resize-handle top-left" @mousedown.stop="initResize($event, 'top-left')"></div>
+                <div class="resize-handle top-right" @mousedown.stop="initResize($event, 'top-right')"></div>
+                <div class="resize-handle bottom-left" @mousedown.stop="initResize($event, 'bottom-left')"></div>
+                <div class="resize-handle bottom-right" @mousedown.stop="initResize($event, 'bottom-right')"></div>
+              </div>
+            </div>
+            <div class="mt-2 flex justify-end">
+              <button @click="processOCR" class="bg-blue-500 text-white px-4 py-2 rounded">Proses</button>
+            </div>
+          </div>
+          <div class="w-full lg:w-1/2 p-2">
+            <div class="bg-gray-700 p-4 rounded">
+              <h2 class="text-xl mb-2 font-semibold">Teks Terekam</h2>
+              <pre class="whitespace-pre-wrap">{{ text }}</pre>
+              <h2 class="text-xl mt-4 mb-2 font-semibold">Koordinat Kotak?</h2>
+              <p>X: {{ box.x }}, Y: {{ box.y }}, Width: {{ box.width }}, Height: {{ box.height }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="loading" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-gray-800 p-6 rounded-lg text-center">
+          <p class="text-white text-xl font-semibold">OCR sedang berjalan...</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.9.359/build/pdf.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+
+</html>
